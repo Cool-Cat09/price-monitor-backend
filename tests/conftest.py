@@ -45,8 +45,6 @@ from sqlalchemy.pool import StaticPool
 url_api = 'sqlite+aiosqlite:///file:API?mode=memory&cache=shared'
 url_checker = 'sqlite+aiosqlite:///file:CHEKCER?mode=memory&cache=shared'
 
-http_mock = patch('checker.checker_worker.check.parse_json')
-
 
 @pytest.fixture(scope='function')
 async def async_engine_api():
@@ -65,7 +63,6 @@ async def async_engine_checker():
         await conn.run_sync(c_Base.metadata.create_all)
     yield engine
     await engine.dispose()
-
 
 
 @pytest.fixture
