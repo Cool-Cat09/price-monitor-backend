@@ -36,6 +36,6 @@ jobs:
 
       - name: Run tests
         env:
-          PYTHONPATH: PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/api
+          PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/api
         run: uv run pytest
 
