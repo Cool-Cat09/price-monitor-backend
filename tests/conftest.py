@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import pytest
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 from testcontainers.rabbitmq import RabbitMqContainer
@@ -5,6 +8,10 @@ from unittest.mock import AsyncMock, patch
 from httpx import AsyncClient, ASGITransport
 from fast_depends import dependency_provider
 from collections.abc import AsyncGenerator
+
+_jwt_keys = Path(__file__).resolve().parent / "jwt_keys"
+os.environ.setdefault("PRIVATE_KEY_PATH", str(_jwt_keys / "private_key.pem"))
+os.environ.setdefault("PUBLIC_KEY_PATH", str(_jwt_keys / "public_key.pem"))
 
 from api import app, db_helper, broker, Base, encode_jwt
 from checker.checker_db.database.engine import ses_control_db

@@ -9,14 +9,17 @@ else:
 
 def encode_jwt(
         payload: dict[Any, Any],
-        private_key: str = jwt_settings.read_private_key,
-        algorithm: str = jwt_settings.algorithm,
-        expire_minutes: int = jwt_settings.access_token_expire
+        private_key: str | None = None,
+        algorithm: str | None = None,
+        expire_minutes: int | None = None,
 ):
     """encoding data using the private key
     
     return: JWT
     """
+    private_key = private_key if private_key is not None else jwt_settings.read_private_key
+    algorithm = algorithm if algorithm is not None else jwt_settings.algorithm
+    expire_minutes = expire_minutes if expire_minutes is not None else jwt_settings.access_token_expire
     to_encode = payload.copy()
     now = datetime.now(timezone.utc)
     expire = timedelta(minutes=expire_minutes) + now
@@ -27,14 +30,14 @@ def encode_jwt(
 
 def decode_jwt(
         token: str | bytes,
-        public_key: str = jwt_settings.read_public_key,
-        algorithm: str = jwt_settings.algorithm,
+        public_key: str | None = None,
+        algorithm: str | None = None,
 ):
     """decoding public key
     
     return: payload
     """
-
-
-    decoded = jwt.decode(jwt=token, key=public_key, algorithms=algorithm)
+    public_key = public_key if public_key is not None else jwt_settings.read_public_key
+    algorithm = algorithm if algorithm is not None else jwt_settings.algorithm
+    decoded = jwt.decode(jwt=token, key=public_key, algorithms=[algorithm])
     return decoded
