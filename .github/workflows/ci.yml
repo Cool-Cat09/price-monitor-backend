@@ -21,9 +21,21 @@ jobs:
 
       - name: Install dependencies
         run: uv sync --frozen
+      
+      - name: Debug structure and run tests
+        run: |
+          echo "=== ТЕКУЩАЯ ДИРЕКТОРИЯ ==="
+          pwd
+          echo "=== СОДЕРЖИМОЕ КОРНЯ ==="
+          ls -la
+          echo "=== ГДЕ PYTHON ИЩЕТ МОДУЛИ ==="
+          uv run python -c "import sys; print('\n'.join(sys.path))"
+          echo "=== ЗАПУСК ТЕСТОВ ==="
+          uv run python -m pytest
+
 
       - name: Run tests
-        run: uv run python -m pytest
+        run: uv run pytest
         env:
           PYTHONPATH: .
 
