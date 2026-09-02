@@ -28,4 +28,3 @@ jobs:
 
       - name: Run tests
         run: uv run pytest
-git commit -m 'create separate service-worker for parsing, now worker use playwright. create database for sendler witch store logs of sended message. create github ci'
