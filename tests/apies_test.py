@@ -1,10 +1,8 @@
-from httpx import AsyncClient, ASGITransport, Client
-from API_SCHEMAS import User, Item, app, authentication, CreatingItem, UpdateItem, CreatingUser, COOKIE_SESSION_ID_KEY
+from httpx import AsyncClient
+from api import User, Item, authentication, CreatingItem, UpdateItem, CreatingUser, COOKIE_SESSION_ID_KEY
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Response
-from . import request_to_test_server, test_db_api, get_auth_token
-from typing import Any
 
 
 async def test_list_of_items(request_to_test_server: AsyncClient, get_auth_token: dict[str, str], test_db_api: AsyncSession):
@@ -15,7 +13,7 @@ async def test_list_of_items(request_to_test_server: AsyncClient, get_auth_token
     
 
 async def test_creating_item(request_to_test_server: AsyncClient, get_auth_token: dict[str, str], test_db_api: AsyncSession):
-    payload = CreatingItem(url='https://google.com', name='GTA 6', need_price=200, shop='wb')
+    payload = CreatingItem(art='11111111', name='GTA 6', need_price=200, shop='wb')
     res = await request_to_test_server.post(url='/create_item', cookies=get_auth_token, json=payload.model_dump())
 
     query = select(Item)
@@ -24,12 +22,12 @@ async def test_creating_item(request_to_test_server: AsyncClient, get_auth_token
     item = item.scalar_one()
 
 
-    assert res.status_code == 200
+    assert res.status_code == 201
     assert isinstance(item, Item)
 
 
 async def test_deleting_item(request_to_test_server: AsyncClient, get_auth_token: dict[str, str], test_db_api: AsyncSession):
-    item = Item(url='https://google.com', name='GTA 6', need_price=200, shop='wb', user_id=1, user_email='bogdanlavrenenko@gmail.com')
+    item = Item(art='11111111', name='GTA 6', need_price=200, shop='wb', user_id=1, user_email='bogdanlavrenenko@gmail.com')
     test_db_api.add(item)
     await test_db_api.commit()
     
@@ -45,12 +43,12 @@ async def test_deleting_item(request_to_test_server: AsyncClient, get_auth_token
 
 
 async def test_patching_item(request_to_test_server: AsyncClient, get_auth_token: dict[str, str], test_db_api: AsyncSession):
-    item = Item(url='https://google.com', name='GTA 6', need_price=200, shop='wb', user_id=1, user_email='bogdanlavrenenko@gmail.com')
+    item = Item(art='11111111', name='GTA 6', need_price=200, shop='wb', user_id=1, user_email='bogdanlavrenenko@gmail.com')
     test_db_api.add(item)
     await test_db_api.commit()
 
 
-    new_item = UpdateItem(need_price=67)
+    new_item = UpdateItem(need_price=60)
     res = await request_to_test_server.patch(url='/patch_item', cookies=get_auth_token, json=new_item.model_dump(exclude_unset=True), params={'id':item.id})
 
     
@@ -63,7 +61,7 @@ async def test_patching_item(request_to_test_server: AsyncClient, get_auth_token
 
     await test_db_api.refresh(item)
 
-    assert update_item.need_price == 67
+    assert update_item.need_price == 60
 
 
 async def test_creating_user(request_to_test_server: AsyncClient, get_auth_token: dict[str, str], test_db_api: AsyncSession):
@@ -78,7 +76,7 @@ async def test_creating_user(request_to_test_server: AsyncClient, get_auth_token
 
 
 
-    assert res.status_code == 200
+    assert res.status_code == 201
     assert isinstance(user, User)
 
 
@@ -113,7 +111,7 @@ async def test_logout(request_to_test_server: AsyncClient, test_db_api: AsyncSes
     res = await request_to_test_server.post(url='/logout', cookies=cookie)
 
 
-    assert res.status_code == 200
+    assert res.status_code == 204
     assert not res.cookies
 
 

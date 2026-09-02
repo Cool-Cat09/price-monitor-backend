@@ -1,0 +1,31 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ "main", "develop" ] 
+  pull_request:
+    branches: [ "main" ]         
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cahe: True
+          python-version: '3.12'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          node-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run tests
+        run: uv run pytest
+git commit -m 'create separate service-worker for parsing, now worker use playwright. create database for sendler witch store logs of sended message. create github ci'

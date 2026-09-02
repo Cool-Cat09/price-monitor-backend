@@ -10,7 +10,7 @@ venv
 private_key.pem
 **/__pycache__/
 *.py[cod]
-.env
+**.env
 server.crt
 server.key
 

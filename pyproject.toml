@@ -26,4 +26,12 @@ dev = [
 [tool.uv.workspace]
 members = [
     "tests",
+    "api",
+    "sendler",
+    "checker/checker_db",
+    "checker/checker_worker",
 ]
+
+[tool.pytest.ini_options]
+import_mode = "importlib"
+testpaths = ["tests"]

@@ -10,4 +10,10 @@ dependencies = [
     "faststream[cli,rabbit]>=0.7.1",
     "pydantic[email]>=2.13.4",
     "pydantic-settings>=2.14.2",
+    "sqlalchemy>=2.0.52",
+    "asyncpg>=0.31.0",
+    "alembic>=1.19.1",
 ]
+
+[tool.pytestini.options]
+pythonpath = [""]
