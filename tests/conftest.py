@@ -1,7 +1,10 @@
 import os
+import tempfile
 from pathlib import Path
 
 import pytest
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 from testcontainers.rabbitmq import RabbitMqContainer
 from unittest.mock import AsyncMock, patch
@@ -9,9 +12,29 @@ from httpx import AsyncClient, ASGITransport
 from fast_depends import dependency_provider
 from collections.abc import AsyncGenerator
 
-_jwt_keys = Path(__file__).resolve().parent / "jwt_keys"
-os.environ.setdefault("PRIVATE_KEY_PATH", str(_jwt_keys / "private_key.pem"))
-os.environ.setdefault("PUBLIC_KEY_PATH", str(_jwt_keys / "public_key.pem"))
+
+def _write_test_jwt_keys() -> tuple[str, str]:
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    directory = Path(tempfile.mkdtemp())
+    private_path = directory / "private_key.pem"
+    public_path = directory / "public_key.pem"
+    private_path.write_bytes(
+        key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=serialization.NoEncryption(),
+        )
+    )
+    public_path.write_bytes(
+        key.public_key().public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+    )
+    return str(private_path), str(public_path)
+
+
+os.environ["PRIVATE_KEY_PATH"], os.environ["PUBLIC_KEY_PATH"] = _write_test_jwt_keys()
 
 from api import app, db_helper, broker, Base, encode_jwt
 from checker.checker_db.database.engine import ses_control_db
